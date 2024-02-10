@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "form" ALTER COLUMN "file_loc" SET DATA TYPE VARCHAR(140);

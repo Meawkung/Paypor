@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lobster&family=Mitr:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sixtyfour&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+li {
+    @apply list-none;
+}
+
+#logo {
+    font-family: "Lobster", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 200%;
+}
+
+.font-prompt {
+    font-family: "Prompt", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.font-lopster {
+    font-family: "Lobster", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.logo {
+    font-family: "Lobster", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 500%;
+}
+
+#logo_main {
+    font-family: "Lobster", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 500%;
+}
+
+.btn {
+    font-family: "Mitr", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+div{
+    font-family: "Mitr", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+#gra{
+    background: linear-gradient(to right, #4CAF50, #2E7D32);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: "Mitr", sans-serif;
+}
+
+#money {
+    @apply font-bold ;
+    font-size: 100px;
+    background-image: linear-gradient(to right, #01300b, #000000);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+#manager {
+    @apply font-bold;
+    font-size: 150px;
+    background-image: linear-gradient(to right, #000000, #000000);
+    background-clip: text;
+    color:transparent;
+}
+
+#background {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom right, #a6d89a, #619265, #a5ee75); /* สร้างสีไล่ */
+    backdrop-filter: blur(10px); /* เพิ่มเอฟเฟกต์ blur */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}

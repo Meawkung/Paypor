@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+}
+
+model users {
+  idusers         Int      @id @default(autoincrement())
+  email           String   @unique(map: "email") @db.VarChar(45)
+  password        String   @db.VarChar(100)
+  reg_date        DateTime
+  last_login_date DateTime @default(now()) @db.Timestamp(0)
+  role            String   @default("user") @db.VarChar(10)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model banks {
+  id           Int    @id @default(autoincrement())
+  bank_number  String @db.VarChar(20)
+  bank_name    String @db.VarChar(50)
+  branch_name  String @db.VarChar(45)
+  account_name String @db.VarChar(45)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model cpe65 {
+  email        String  @db.VarChar(18)
+  student_id   String  @db.VarChar(11)
+  prefix       String  @db.VarChar(7)
+  name         String  @db.VarChar(30)
+  surname      String  @db.VarChar(30)
+  nickname     String  @db.VarChar(10)
+  is_admin     Boolean @default(false)
+  user_idusers Int?    @unique(map: "user_idusers")
+  paylists_id  Int?    @unique(map: "paylists_id")
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model form {
+  id          Int      @id @default(autoincrement())
+  datetime    DateTime @default(now()) @db.Timestamp(0)
+  file_loc    String   @db.VarChar(200)
+  status      Boolean
+  selected_months String @db.VarChar(100)
+  cpe65_email String   @db.VarChar(18)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model paylists {
+  id        Int     @id
+  july      Int
+  baisri    Int
+  august    Int
+  september Int
+  november  Int
+  december  Int
+  january   Int
+  fabuary   Int
+  year      Int
+  email     String  @db.VarChar(18)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model statements {
+  id          Int      @id @default(autoincrement())
+  datetime    DateTime 
+  description String   @db.VarChar(100)
+  amount      Decimal  @db.Decimal(10, 2)
+  balance     Decimal  @db.Decimal(10, 2)
+  cpe65_email String   @db.VarChar(18)
+  banks_id    Int
+
+  @@ignore
+}
