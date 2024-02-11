@@ -20,12 +20,21 @@ export async function POST(request) {
                 email: email
             }
         });
+        // ดึงข้อมูลรหัสผ่านใหม่จาก request body
+        const requestBody = await request.json();
 
+        const passwordMatch = await bcrypt.compare(requestBody.password, user.password);
+
+        if (!passwordMatch) {
+            return new Response(JSON.stringify({ error: "รหัสผ่านเดิม ไม่ถูกต้อง กรุณาลองอีกครั้ง!" }), {
+                headers: { "Content-Type": "application/json" },
+                status: 400,
+            });
+        }
         // ตรวจสอบสิทธิ์ของผู้ใช้และอนุญาตให้เปลี่ยนรหัสผ่าน
         if (user.role === 'admin' || user.role === 'user') {
             // อนุญาตให้เปลี่ยนรหัสผ่าน
-            // ดึงข้อมูลรหัสผ่านใหม่จาก request body
-            const requestBody = await request.json();
+
             const newPassword = requestBody.newPassword;
 
             // เข้ารหัสรหัสผ่านใหม่

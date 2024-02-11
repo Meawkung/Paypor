@@ -10,7 +10,7 @@ const CDNURL = "https://rkcopmoevxfywvtpkqvt.supabase.co/storage/v1/object/publi
 export default function Main() {
   const [userData, setUserData] = useState(null);
   const [images, setImages] = useState([]);
-  const supabase = createClient('https://rkcopmoevxfywvtpkqvt.supabase.co', 'process.env.SUPABASE_KEY');
+  const supabase = createClient('https://rkcopmoevxfywvtpkqvt.supabase.co','process.env.SUPABASE_KEY');
   const [month, setMonth] = useState('');
   const [sumAll, setSumAll] = useState('');
   const [notPayOne, setNotPayOne] = useState('');
@@ -40,7 +40,7 @@ export default function Main() {
       console.log(error);
     }
   }
-
+// /api/user
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -65,7 +65,7 @@ export default function Main() {
     fetchUserData();
   }, []);
 
-
+// /api/userPayment
   useEffect(() => {
     const fetchPaylist = async () => {
       try {
@@ -94,7 +94,7 @@ export default function Main() {
     fetchPaylist();
   }, []);
 
-
+// /api/allBalance
   useEffect(() => {
     const fetchPaylist = async () => {
       try {
@@ -123,7 +123,7 @@ export default function Main() {
     fetchPaylist();
   }, []);
 
-
+// /api/notPayone
   useEffect(() => {
     const fetchPaymentOne = async () => {
       try {
@@ -149,7 +149,7 @@ export default function Main() {
     fetchPaymentOne();
   }, []);
 
-
+// /api/notPayall
   useEffect(() => {
     const fetchPaymentAll = async () => {
       try {
@@ -183,20 +183,20 @@ export default function Main() {
     // ตรวจสอบว่า checkbox ที่ index ถูกเลือกหรือไม่
     if (updatedCheckedState[index]) {
       // เพิ่มค่า 100 เข้าไปในตัวแปร addPay200 เมื่อ checkbox ถูกเลือก และ index เป็น 0
-      if (index === 0) {
+      const month = zeroAmount?.amount[index]?.month;
+      if (zeroAmount?.amount[index]?.month === 'july') {
         setAddPay200(prevValue => prevValue + 100);
-      }else if(index === 1){
+      }else if(zeroAmount?.amount[index]?.month === 'baisri'){
         setAddPay200(prevValue => prevValue + 50);
       } else {
         setAddPay200(prevValue => prevValue + 200);
       }
-      const month = zeroAmount?.amount[index]?.month;
       setSelectedMonths(prevMonths => [...prevMonths, month]);
     } else {
       // ลบค่า 200 ออกจากตัวแปร addPay200 เมื่อ checkbox ไม่ถูกเลือก
-      if (index === 0) {
+      if ((zeroAmount?.amount[index]?.month === 'july')) {
         setAddPay200(prevValue => prevValue - 100);
-      }else if(index === 1){
+      }else if(zeroAmount?.amount[index]?.month === 'baisri'){
         setAddPay200(prevValue => prevValue - 50);
       } else {
         setAddPay200(prevValue => prevValue - 200);
@@ -210,6 +210,14 @@ export default function Main() {
   const handleSumitForm = async (e) => {
     e.preventDefault();
     let file = fileinput;
+    // show image preview
+    let reader = new FileReader();
+    reader.onload = function (e) {
+      let image = document.createElement('img');
+      image.src = e.target.result;
+      document.getElementById('image-preview').appendChild(image);
+    }
+
     let randomChar = uuidv4();
     // userid:65021521
     // 65021521/
@@ -254,17 +262,27 @@ export default function Main() {
   return (
     <>
       <Navbar />
+      
       <div className='mx-9'>
         <div id='dashboard'>
           {userData && (
             <div className='text-2xl py-7 flex justify-center'>
               <div className='flex-1'>
-                <div className='underline pb-3'>สวัสดีคุณ</div>
-                <span className='font-prompt'>{userData[0].name} {userData[0].surname}</span>
+                <div className='underline pb-3'>สวัสดี</div>
+                <div id="gra" className="font-sans font-bold text-5xl pb-3">{userData[0].nickname}</div>
+                <span className='font-prompt'>{userData[0].student_id} {userData[0].prefix}{userData[0].name} {userData[0].surname}</span>
               </div>
             </div>
           )}
-          <div className="stats shadow">
+
+            {/* show when user have the data on form that the status if FALSE */}
+            <div role="alert" className="alert alert-info w-auto max-w-max flex flex-wrap justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>รายการชำระเงินของคุณอยู่ในระหว่างตรวจสอบ</span>
+            </div>
+            <br></br>
+
+          <div className="stats shadow ">
             <div className="stats px-10">
               <div className="stat">
                 <div className="stat-title">ค้างชำระ</div>
@@ -281,7 +299,7 @@ export default function Main() {
             </div>
           </div>
         </div>
-        <p className="mr-3 text-red-500 text-xl py-5">เดือนที่คุณค้างชำระ</p>
+        <p className="mr-3 text-red-500 text-2xl py-5">รายการชำระเงินของคุณ</p>
         <div className='flex-1 mx-5 flex space-x-5 pt-1'>
           <div>
             <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
@@ -313,8 +331,8 @@ export default function Main() {
         </div>
 
 
-        <div id='payment' className='py-6'>
-          <h2 className='text-2xl py-5'>จ่ายเงิน</h2>
+        <div id='payment'>
+          <h2 className='text-2xl py-5'>กรุณาเลือกจ่ายเงินด้านล่างนี้</h2>
           <div className='flex-1 mx-5 flex space-x-5 pt-1'>
             <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
               {zeroAmount?.amount?.map((item, index) => (
@@ -331,23 +349,22 @@ export default function Main() {
                       </svg>
                     )}
                   </div>
-                  <label className={`${isChecked[index] ? 'text-white' : 'text-red-500'}`} style={{ marginLeft: '5px' }}> {index === 0 ? '100' : index === 1 ? '50' : '200'} <span className={`${isChecked[index] ? 'text-white' : 'text-black'}`}>บาท</span>
+                  <label className={`${isChecked[index] ? 'text-white' : 'text-red-500'}`} style={{ marginLeft: '5px' }}> {zeroAmount?.amount[index]?.month === 'july' ? '100' : zeroAmount?.amount[index]?.month === 'baisri' ? '50' : '200'} <span className={`${isChecked[index] ? 'text-white' : 'text-black'}`}>บาท</span>
                   </label>
                 </div>
               ))}
             </div>
           </div>
-          <h2 className='py-5'>รวมเป็นเงิน {addPay200} บาท</h2>
 
-          <div>แสกนเพื่อชำระเงิน</div>
+          
 
           {addPay200 === 0 ? (
             <div>ไม่มีรายการที่ต้องชำระ</div>
           ) : (
+          <div>สแกนเพื่อชำระเงิน
+            <h2 className='py-5'>รวมเป็นเงิน {addPay200} บาท</h2>
             <img src={`https://promptpay.io/0987486424/${addPay200}.png/`}></img>
-          )}
-
-          <form onSubmit={handleSumitForm}>
+            <form onSubmit={handleSumitForm}>
             <input
               className="file-input file-input-bordered w-full max-w-xs"
               type="file"
@@ -357,9 +374,14 @@ export default function Main() {
             />
             <button type='submit' className='btn btn-primary'>ยืนยัน</button>
           </form>
+            </div>
+          )}
+
+          
         </div>
       </div>
       <div className='flex flex-wrap'>
+        <div id="image-preview" />
         {images.length > 0 && (
           <div className='m-5'>
             <img src={CDNURL + `${userData[0].student_id}` + "/" + images[0].name} alt={images[0].name} />

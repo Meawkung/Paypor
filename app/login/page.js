@@ -44,7 +44,7 @@ export default function Login() {
 
   return (
     <>
-      <div className="hero min-h-screen " style={{ backgroundImage: 'url(https://img.freepik.com/free-vector/dark-gradient-background-with-copy-space_53876-99548.jpg?w=1380&t=st=1706779364~exp=1706779964~hmac=f133a114ccf36078c1b8cdcd63d20ff2962c5da285feaea8dcb0ee6d4e1c7f75)' }}>
+      <div className="hero min-h-screen " style={{ backgroundImage: 'url(https://rkcopmoevxfywvtpkqvt.supabase.co/storage/v1/object/public/images/plant-growing-savings-coins-reduced.jpg)' }}>
         <div className="hero-content flex-col">
           <h1 className="logo text-white">PayPor</h1>
           <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">

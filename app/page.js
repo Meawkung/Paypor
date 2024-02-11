@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="hero h-screen relative" style={{ backgroundImage: 'url(https://daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.jpg)', backgroundSize: 'cover' }}>
+      <div className="hero h-screen relative" style={{ backgroundImage: 'url(https://rkcopmoevxfywvtpkqvt.supabase.co/storage/v1/object/public/images/plant-growing-from-coins-glass-jar-blurred-nature.jpg)', backgroundSize: 'cover' }}>
         <div className="hero-overlay bg-opacity-60"></div>
         <div className="hero-content text-center text-neutral-content">
           <div className="max-w-md">

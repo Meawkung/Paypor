@@ -23,7 +23,7 @@ export async function GET(request) {
         // ตรวจสอบความถูกต้องของ token
         const decodedToken = jwt.verify(token, "sohardtodecode");
 
-        const admin = await prisma.$queryRaw`SELECT * FROM form `;
+        const admin = await prisma.$queryRaw`SELECT * FROM form WHERE status = false`;
 
         return new Response(JSON.stringify(admin), {
             headers: { "Content-Type": "application/json" },
