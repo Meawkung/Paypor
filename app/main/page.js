@@ -5,12 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { createClient } from "@supabase/supabase-js";
 import '../globals.css'
 
-const CDNURL = "https://rkcopmoevxfywvtpkqvt.supabase.co/storage/v1/object/public/images/"
-
 export default function Main() {
   const [userData, setUserData] = useState(null);
-  const [images, setImages] = useState([]);
-  const supabase = createClient('https://rkcopmoevxfywvtpkqvt.supabase.co',process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const [month, setMonth] = useState('');
   const [sumAll, setSumAll] = useState('');
   const [notPayOne, setNotPayOne] = useState('');
@@ -23,25 +20,6 @@ export default function Main() {
   const [status, setStatus] = useState(true);
   const [loading, setLoading] = useState(true);
 
-
-  async function getImages() {
-    let { data, error } = await supabase
-      .storage
-      .from('images')
-      .list(userData[0]?.student_id + "/", {
-        limit: 100,
-        offset: 0,
-        sortBy: { column: "name", order: "asc" }
-      });
-
-
-    if (data !== null) {
-      setImages(data);
-    } else {
-      alert('error');
-      console.log(error);
-    }
-  }
   // /api/user
   useEffect(() => {
     const fetchUserData = async () => {
