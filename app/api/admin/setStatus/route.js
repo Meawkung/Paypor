@@ -22,13 +22,24 @@ export async function POST(request) {
             })
         }
 
+        const token = tokenCookie.split('=')[1]
+
+        const decodedToken = jwt.verify(token, 'sohardtodecode')
+
+        if (decodedToken.role !== 'admin') {
+            return new Response(JSON.stringify({ error: 'Permission denied' }), {
+                headers: { 'Content-Type': 'application/json' },
+                status: 400,
+            })
+        }
+        
         await prisma.$queryRaw`
             UPDATE form
             SET status = ${Status}
             WHERE cpe65_email = ${email} AND selected_months = ${String}
         `
 
-        return new Response(JSON.stringify({ message: 'Status updated' }), {
+        return new Response(JSON.stringify({ message: 'Status updated'}), {
             headers: { 'Content-Type': 'application/json' },
             status: 200,
         })

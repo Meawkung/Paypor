@@ -19,7 +19,7 @@ const Lightbox = ({ imageUrl, onClose }) => {
     return ReactDOM.createPortal(
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" id="lightbox-overlay" onClick={onClose}>
             <div className="relative max-w-screen-md max-h-screen-md" onClick={(e) => e.stopPropagation()}>
-                <img src={imageUrl} alt="Enlarged" className="max-h-full max-w-full mx-auto" />
+                <img src={imageUrl} alt="Enlarged" className="w-2/4 mx-auto" />
                 <button
                     onClick={onClose}
                     className="absolute top-0 right-0 m-4 text-white hover:text-gray-300 focus:outline-none"

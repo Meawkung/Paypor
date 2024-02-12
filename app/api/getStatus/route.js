@@ -1,13 +1,14 @@
 import { PrismaClient } from "@prisma/client";
+
 import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
 export async function GET(request) {
     try {
+
         const cookieHeader = request.headers.get("Cookie");
         const tokenCookie = cookieHeader.split(";").find((cookie) => cookie.trim().startsWith("token="));
-
 
         // ตรวจสอบว่ามี token cookie หรือไม่
         if (!tokenCookie) {
@@ -23,26 +24,30 @@ export async function GET(request) {
         // ตรวจสอบความถูกต้องของ token
         const decodedToken = jwt.verify(token, "sohardtodecode");
 
-        if (decodedToken.role === 'admin') {
-        const adminData = await prisma.$queryRaw`
-            SELECT * 
-            FROM cpe65;`;
 
-        const adminByEmail = {};
-        adminData.forEach(admin => {
-            adminByEmail[admin.email] = admin;
+        const data = await prisma.$queryRaw`
+            SELECT status, cpe65_email 
+            FROM form 
+            WHERE cpe65_email = ${decodedToken.email}`;
+
+        const result = {};
+
+        data.forEach(item => {
+            const email = item.cpe65_email;
+            const status = item.status;
+
+            // ตรวจสอบว่า email ยังไม่มีอยู่ในอ็อบเจกต์ result หรือไม่
+            if (!result[email]) {
+                result[email] = []; // สร้างอาร์เรย์เปล่าสำหรับเก็บ status ของ email นั้นๆ
+            }
+
+            result[email].push(status); // เพิ่ม status เข้าไปในอาร์เรย์ของ email นั้นๆ
         });
 
-        return new Response(JSON.stringify(adminByEmail), {
+        return new Response(JSON.stringify(result), {
             headers: { "Content-Type": "application/json" },
             status: 200,
         });
-    } else {
-        return new Response(JSON.stringify({ error: "Permission denied" }), {
-            headers: { "Content-Type": "application/json" },
-            status: 400,
-        });
-    }
 
     } catch (error) {
         console.error("Error fetching user data:", error);

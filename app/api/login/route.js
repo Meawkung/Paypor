@@ -33,11 +33,12 @@ export async function POST(request) {
         }
 
         // สร้าง token
-        const token = jwt.sign({ email: user.email, role: user.role}, 'sohardtodecode', { expiresIn: '1d' });
+        const token = jwt.sign({ email: user.email, role: user.role }, 'sohardtodecode', { expiresIn: '1d' });
 
         // เก็บ token ในคุกกี้
-        const cookie = `token=${token}; Path=/; HttpOnly; SameSite=Strict`; // ตั้งค่าคุกกี้
-        
+        const oneDayInSeconds = 24 * 60 * 60; // 1 วันมีวินาทีเท่ากับ 24 ชั่วโมง x 60 นาที x 60 วินาที
+        const cookie = `token=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${oneDayInSeconds}`;
+
         // ส่งคำตอบกับคุกกี้ไปยังผู้ใช้
         return new Response(JSON.stringify({ success: "Login success", token }), {
             headers: {

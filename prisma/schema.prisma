@@ -12,8 +12,6 @@ model users {
   idusers         Int      @id @default(autoincrement())
   email           String   @unique(map: "email") @db.VarChar(45)
   password        String   @db.VarChar(100)
-  reg_date        DateTime
-  last_login_date DateTime @default(now()) @db.Timestamp(0)
   role            String   @default("user") @db.VarChar(10)
 }
 

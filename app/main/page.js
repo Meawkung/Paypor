@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
-import Navbar from '../main/components/navbar';
+import Navbar from './components/navbar';
 import { v4 as uuidv4 } from 'uuid';
 import { createClient } from "@supabase/supabase-js";
 import '../globals.css'
@@ -10,7 +10,7 @@ const CDNURL = "https://rkcopmoevxfywvtpkqvt.supabase.co/storage/v1/object/publi
 export default function Main() {
   const [userData, setUserData] = useState(null);
   const [images, setImages] = useState([]);
-  const supabase = createClient('https://rkcopmoevxfywvtpkqvt.supabase.co','process.env.SUPABASE_KEY');
+  const supabase = createClient('https://rkcopmoevxfywvtpkqvt.supabase.co',process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const [month, setMonth] = useState('');
   const [sumAll, setSumAll] = useState('');
   const [notPayOne, setNotPayOne] = useState('');
@@ -20,6 +20,8 @@ export default function Main() {
   const [addPay200, setAddPay200] = useState(0);
   const [fileinput, setFileinput] = useState(null);
   const [selectedMonths, setSelectedMonths] = useState([]);
+  const [status, setStatus] = useState(true);
+  const [loading, setLoading] = useState(true);
 
 
   async function getImages() {
@@ -40,7 +42,7 @@ export default function Main() {
       console.log(error);
     }
   }
-// /api/user
+  // /api/user
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -54,6 +56,7 @@ export default function Main() {
         if (response.ok) {
           const data = await response.json();
           setUserData(data.user);
+          setLoading(false);
         } else {
           console.error('Failed to fetch user data');
         }
@@ -65,7 +68,7 @@ export default function Main() {
     fetchUserData();
   }, []);
 
-// /api/userPayment
+  // /api/userPayment
   useEffect(() => {
     const fetchPaylist = async () => {
       try {
@@ -94,7 +97,7 @@ export default function Main() {
     fetchPaylist();
   }, []);
 
-// /api/allBalance
+  // /api/allBalance
   useEffect(() => {
     const fetchPaylist = async () => {
       try {
@@ -123,7 +126,7 @@ export default function Main() {
     fetchPaylist();
   }, []);
 
-// /api/notPayone
+  // /api/notPayone
   useEffect(() => {
     const fetchPaymentOne = async () => {
       try {
@@ -149,7 +152,7 @@ export default function Main() {
     fetchPaymentOne();
   }, []);
 
-// /api/notPayall
+  // /api/notPayall
   useEffect(() => {
     const fetchPaymentAll = async () => {
       try {
@@ -175,18 +178,51 @@ export default function Main() {
   }, []);
 
 
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch('/api/getStatus', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          for (const email in data) {
+            if (Object.hasOwnProperty.call(data, email)) {
+              const statuses = data[email]; // ดึงอาร์เรย์ของสถานะสำหรับอีเมลนี้
+              for (const status of statuses) {
+                if (status === false) {
+                  setStatus(false);
+                }
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchStatus(); // เรียกใช้งานฟังก์ชันทันทีเมื่อหน้าโหลด
+
+  }, []);
+
   const handleCheckboxChange = (index) => {
     const updatedCheckedState = [...isChecked];
     updatedCheckedState[index] = !updatedCheckedState[index];
     setIsChecked(updatedCheckedState);
-  
+
     // ตรวจสอบว่า checkbox ที่ index ถูกเลือกหรือไม่
     if (updatedCheckedState[index]) {
       // เพิ่มค่า 100 เข้าไปในตัวแปร addPay200 เมื่อ checkbox ถูกเลือก และ index เป็น 0
       const month = zeroAmount?.amount[index]?.month;
       if (zeroAmount?.amount[index]?.month === 'july') {
         setAddPay200(prevValue => prevValue + 100);
-      }else if(zeroAmount?.amount[index]?.month === 'baisri'){
+      } else if (zeroAmount?.amount[index]?.month === 'baisri') {
         setAddPay200(prevValue => prevValue + 50);
       } else {
         setAddPay200(prevValue => prevValue + 200);
@@ -196,7 +232,7 @@ export default function Main() {
       // ลบค่า 200 ออกจากตัวแปร addPay200 เมื่อ checkbox ไม่ถูกเลือก
       if ((zeroAmount?.amount[index]?.month === 'july')) {
         setAddPay200(prevValue => prevValue - 100);
-      }else if(zeroAmount?.amount[index]?.month === 'baisri'){
+      } else if (zeroAmount?.amount[index]?.month === 'baisri') {
         setAddPay200(prevValue => prevValue - 50);
       } else {
         setAddPay200(prevValue => prevValue - 200);
@@ -205,19 +241,11 @@ export default function Main() {
       setSelectedMonths(prevMonths => prevMonths.filter(item => item !== month));
     }
   };
-  
+
 
   const handleSumitForm = async (e) => {
     e.preventDefault();
     let file = fileinput;
-    // show image preview
-    let reader = new FileReader();
-    reader.onload = function (e) {
-      let image = document.createElement('img');
-      image.src = e.target.result;
-      document.getElementById('image-preview').appendChild(image);
-    }
-
     let randomChar = uuidv4();
     // userid:65021521
     // 65021521/
@@ -243,8 +271,8 @@ export default function Main() {
           },
           body: JSON.stringify({ publicUrl, month })
         });
-
-        getImages();
+        window.location.reload();
+        // getImages();
       } else {
         alert('failed to upload');
         console.log(error);
@@ -255,16 +283,27 @@ export default function Main() {
   const uploadImage = (e) => {
     let file = e.target.files[0];
     setFileinput(file);
-    getImages();
+    let reader = new FileReader();
+    reader.onload = function (e) {
+      let image = document.createElement('img');
+      image.src = e.target.result;
+      document.getElementById('image-preview').innerHTML = ''; // Clear previous preview
+      document.getElementById('image-preview').appendChild(image);
+    };
+    reader.readAsDataURL(file);
+    // getImages();
   }
 
 
   return (
     <>
       <Navbar />
-      
+
       <div className='mx-9'>
         <div id='dashboard'>
+          {loading && (
+            <div className="skeleton w-32 h-32"></div>
+          )}
           {userData && (
             <div className='text-2xl py-7 flex justify-center'>
               <div className='flex-1'>
@@ -275,31 +314,60 @@ export default function Main() {
             </div>
           )}
 
-            {/* show when user have the data on form that the status if FALSE */}
-            <div role="alert" className="alert alert-info w-auto max-w-max flex flex-wrap justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span>รายการชำระเงินของคุณอยู่ในระหว่างตรวจสอบ</span>
-            </div>
-            <br></br>
+          {/* show when user have the data on form that the status if FALSE */}
+          <div>
+            {status === false && (
+              <div role="alert" className="alert alert-info w-auto max-w-max flex flex-wrap justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="stroke-current shrink-0 w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <span>รายการชำระเงินของคุณอยู่ในระหว่างตรวจสอบ</span>
+                {/* เพิ่มโค้ดที่ต้องการให้ระบบดำเนินการเมื่อสถานะเป็น false ที่นี่ */}
+              </div>
+            )}
+          </div>
+
+          <br></br>
 
           <div className="stats shadow ">
             <div className="stats px-10">
               <div className="stat">
                 <div className="stat-title">ค้างชำระ</div>
+                {loading && (
+            <div className="skeleton w-32 h-32"></div>
+          )}
                 <div className="stat-value text-yellow-400 font-sans">{notPayOne}</div> {/* ยังไม่ได้ */}
               </div>
               <div className="stat">
                 <div className="stat-title">ยอดค้างทั้งหมดในสาขา</div>
+                {loading && (
+            <div className="skeleton w-32 h-32"></div>
+          )}
                 <div className="stat-value text-red-400 font-sans">{notPayAll}</div> {/* ยังไม่ได้ */}
               </div>
               <div className="stat">
-                <div className="stat-title">ยอดเงินเก็บทั้งสาขา</div>
+                <div className="stat-title">ยอดเงินเก็บทั้งสาขา</div>{loading && (
+            <div className="skeleton w-32 h-32"></div>
+          )}
                 <div className="stat-value text-primary font-sans">{sumAll}</div>
               </div>
             </div>
           </div>
         </div>
         <p className="mr-3 text-red-500 text-2xl py-5">รายการชำระเงินของคุณ</p>
+        {loading && (
+            <div className="skeleton w-32 h-32"></div>
+          )}
         <div className='flex-1 mx-5 flex space-x-5 pt-1'>
           <div>
             <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
@@ -333,6 +401,9 @@ export default function Main() {
 
         <div id='payment'>
           <h2 className='text-2xl py-5'>กรุณาเลือกจ่ายเงินด้านล่างนี้</h2>
+          {loading && (
+            <div className="skeleton w-32 h-32"></div>
+          )}
           <div className='flex-1 mx-5 flex space-x-5 pt-1'>
             <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
               {zeroAmount?.amount?.map((item, index) => (
@@ -356,37 +427,38 @@ export default function Main() {
             </div>
           </div>
 
-          
 
           {addPay200 === 0 ? (
             <div>ไม่มีรายการที่ต้องชำระ</div>
           ) : (
-          <div>สแกนเพื่อชำระเงิน
-            <h2 className='py-5'>รวมเป็นเงิน {addPay200} บาท</h2>
-            <img src={`https://promptpay.io/0987486424/${addPay200}.png/`}></img>
-            <form onSubmit={handleSumitForm}>
-            <input
-              className="file-input file-input-bordered w-full max-w-xs"
-              type="file"
-              id="formFile"
-              accept='image/*'
-              onChange={(e) => uploadImage(e)}
-            />
-            <button type='submit' className='btn btn-primary'>ยืนยัน</button>
-          </form>
+            <div>สแกนเพื่อชำระเงิน
+              <h2 className='py-5'>รวมเป็นเงิน {addPay200} บาท</h2>
+              <img src={`https://promptpay.io/0987486424/${addPay200}.png/`}></img>
+              <form onSubmit={handleSumitForm}>
+                <input
+                  className="file-input file-input-bordered w-full max-w-xs"
+                  type="file"
+                  id="formFile"
+                  accept='image/*'
+                  onChange={(e) => uploadImage(e)}
+                />
+                <button type='submit' className='btn btn-primary'>ยืนยัน</button>
+              </form>
             </div>
           )}
 
-          
-        </div>
+
+</div>
       </div>
-      <div className='flex flex-wrap'>
-        <div id="image-preview" />
-        {images.length > 0 && (
-          <div className='m-5'>
-            <img src={CDNURL + `${userData[0].student_id}` + "/" + images[0].name} alt={images[0].name} />
-          </div>
-        )}
+      <div>
+          {fileinput && (
+            <>
+            <h2 className='text-xl mb-2'>รูปภาพที่คุณกำลังจะอัพโหลด</h2>
+            <div id="image-preview" className=" p-3 max-w-md mx-1 mb-4">
+            <img src={URL.createObjectURL(fileinput)} alt="Preview" className="w-full" />
+            </div>
+            </>
+          )}
       </div>
     </>
   );

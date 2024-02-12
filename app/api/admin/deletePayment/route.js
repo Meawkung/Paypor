@@ -36,31 +36,9 @@ export async function POST(request) {
             });
         }
 
-        const Status = await prisma.$queryRaw`SELECT status FROM form WHERE cpe65_email = ${email} AND selected_months = ${String}`;
+        const data = await prisma.$queryRaw`DELETE FROM form WHERE cpe65_email = ${email} AND selected_months = ${String}`;
 
-        if (Status === false) {
-            console.log("Don't update paylists");
-        } else {
-            await prisma.$queryRaw`
-                UPDATE paylists 
-                SET
-                    july = CASE WHEN 'july' = ANY(string_to_array(f.selected_months, ', ')) THEN 100 ELSE july END,
-                    baisri = CASE WHEN 'baisri' = ANY(string_to_array(f.selected_months, ', ')) THEN 50 ELSE baisri END,
-                    august = CASE WHEN 'august' = ANY(string_to_array(f.selected_months, ', ')) THEN 200 ELSE august END,
-                    september = CASE WHEN 'september' = ANY(string_to_array(f.selected_months, ', ')) THEN 200 ELSE september END,
-                    november = CASE WHEN 'november' = ANY(string_to_array(f.selected_months, ', ')) THEN 200 ELSE november END,
-                    december = CASE WHEN 'december' = ANY(string_to_array(f.selected_months, ', ')) THEN 200 ELSE december END,
-                    january = CASE WHEN 'january' = ANY(string_to_array(f.selected_months, ', ')) THEN 200 ELSE january END,
-                    fabuary = CASE WHEN 'fabuary' = ANY(string_to_array(f.selected_months, ', ')) THEN 200 ELSE fabuary END
-                FROM form f
-                WHERE f.cpe65_email = ${email}
-                AND f.status = true
-                AND paylists.email = ${email}
-            `;
-        }
-
-
-        return new Response(JSON.stringify({ message: "Update paylists" }), {
+        return new Response(JSON.stringify({ message: "Payment deleted" }), {
             headers: { "Content-Type": "application/json" },
             status: 200,
         });
@@ -72,3 +50,5 @@ export async function POST(request) {
         });
     }
 }
+
+

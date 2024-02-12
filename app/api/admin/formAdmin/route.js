@@ -23,6 +23,13 @@ export async function GET(request) {
         // ตรวจสอบความถูกต้องของ token
         const decodedToken = jwt.verify(token, "sohardtodecode");
 
+        if (decodedToken.role !== 'admin') {
+            return new Response(JSON.stringify({ error: "Permission denied" }), {
+                headers: { "Content-Type": "application/json" },
+                status: 400,
+            });
+        }
+
         const admin = await prisma.$queryRaw`SELECT * FROM form WHERE status = false`;
 
         return new Response(JSON.stringify(admin), {
